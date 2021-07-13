@@ -49,6 +49,11 @@ module SessionsHelper
   def logged_in?
     !current_user.nil?
   end
+  
+  # 管理者ユーザーであればtrue、そうでなければfalseを返します。
+  def admin?
+    current_user.admin?
+  end
 
   # 記憶しているURL(またはデフォルトURL)にリダイレクトします。
   def redirect_back_or(default_url)

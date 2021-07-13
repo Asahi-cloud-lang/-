@@ -45,6 +45,11 @@
 
 /* ユーザー一覧ページ */
 
+.search-form form {
+  text-align: right;
+  line-height: 2.7rem;
+}
+
 #table-users {
   td {
     vertical-align: middle;
@@ -61,3 +66,4 @@
   margin: 15px 0;
   width: 30%;
 }
+

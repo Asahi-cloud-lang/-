@@ -51,4 +51,32 @@ class ApplicationController < ActionController::Base
     flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
     redirect_to root_url
   end
+  
+  # ページ出力前に1週間分のデータの存在を確認・セットします。
+  def set_one_week
+    @first_day = params[:date].to_date.beginning_of_week
+    @last_day = @first_day.end_of_week
+    @one_week = [*@first_day..@last_day] # 対象の日数を代入します。
+    @first_week = [*@first_day..@first_day.end_of_month]
+    @last_week = [*@last_day.beginning_of_week..@last_day]
+    # ユーザーに紐付く一ヶ月分のレコードを検索し取得します。
+    @attendances = @user.attendances.where(worked_on: [*@first_day..@last_day]).order(:worked_on)
+
+    unless @one_week.count == @attendances.count # それぞれの件数（日数）が一致するか評価します
+      ActiveRecord::Base.transaction do
+      if @first_day.end_of_month == @last_day.end_of_month
+        @one_week.each { |day| @user.attendances.create!(worked_on: day) }
+      elsif @one_week.count == @attendances.count + @last_week.count
+        @last_week.each { |day| @user.attendances.create!(worked_on: day) } 
+      elsif @one_week.count == @attendances.count + @first_week.count
+        @first_week.each { |day| @user.attendances.create!(worked_on: day) }  
+      end
+      end
+    @attendances = @user.attendances.where(worked_on: [*@first_day..@last_day]).order(:worked_on)
+    end
+
+  rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
+    flash[:danger] = "ページ情報の取得に失敗しました、再アクセスしてください。"
+    redirect_to root_url
+  end
 end

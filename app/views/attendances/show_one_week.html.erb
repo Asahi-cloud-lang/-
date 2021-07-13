@@ -3,9 +3,9 @@
   <table class="table table-bordered table-condensed user-table">
     <tr>
       <td>
-          <%= link_to image_tag("allow-left.png"), user_path(date: @first_day.prev_month), class: "arrow-button" %>
+          <%= link_to image_tag("allow-left.png"), attendances_show_one_week_user_path(date: @first_day.prev_week), class: "arrow-button" %>
           　<%= l(@first_day, format: :middle) %>　勤怠管理表　
-          <%= link_to image_tag("allow-right.png"), user_path(date: @first_day.next_month), class: "arrow-button" %>
+          <%= link_to image_tag("allow-right.png"), attendances_show_one_week_user_path(date: @first_day.next_week), class: "arrow-button" %>
       </td>
       <td>指定勤務時間：<%= format_basic_info(@user.work_time) %></td>
       <td colspan="3">基本時間：<%= format_basic_info(@user.basic_time) %></td>
@@ -24,14 +24,18 @@
 </div>
 <div class="btn-users-show">
   
-  <%= link_to "勤怠編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-success" %>
+<div class="btn-users-show">
   
+  <%= link_to "勤怠編集", attendances_edit_one_week_user_path(date: @first_day), class: "btn btn-success" %>
+  
+</div>
+
 </div>
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
     <thead>
       <tr>
-        <th rowspan="2">日付</th>
+        <th rowspan="2"><%= @attendances.count %>日付</th>
         <th rowspan="2">曜日</th>
         <th colspan="3">出社</th>
         <th colspan="3">退社</th>
@@ -65,7 +69,7 @@
             <% end %>
           </td>
           <td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
-          <td><%= l(day.finished_at, format: :minute) if day.finished_at.present? %></td>
+          <td><%= working_time_format(l(day.finished_at, format: :minute)) if day.finished_at.present? %></td>
           <td>
             <% if btn_text = attendance_state(day) %>
               <% if btn_text != "出社" %>
