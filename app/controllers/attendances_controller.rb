@@ -12,13 +12,13 @@ class AttendancesController < ApplicationController
     @attendance = Attendance.find(params[:id])
     # 出勤時間が未登録であることを判定します。
     if @attendance.started_at.nil?
-      if @attendance.update_attributes(started_at: Time.current.floor_to(15.minutes).change(sec: 0))
+      if @attendance.update_attributes(started_at: Time.current.change(sec: 0))
         flash[:info] = "おはようございます！"
       else
         flash[:danger] = UPDATE_ERROR_MSG
       end
     elsif @attendance.finished_at.nil?
-      if @attendance.update_attributes(finished_at: Time.current.floor_to(15.minutes).change(sec: 0))
+      if @attendance.update_attributes(finished_at: Time.current.change(sec: 0))
         flash[:info] = "お疲れ様でした。"
       else
         flash[:danger] = UPDATE_ERROR_MSG
@@ -48,6 +48,7 @@ class AttendancesController < ApplicationController
   end
 
   def show_one_week
+    @worked_sum = @attendances.where.not(started_at: nil).count
   end
 
   def edit_one_week
@@ -61,8 +62,6 @@ class AttendancesController < ApplicationController
           redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return
         end
         attendance = Attendance.find(id)
-        item[:started_at].to_time.floor_to(15.minutes)
-        item[:finished_at].to_time.floor_to(15.minutes)
         attendance.update_attributes!(item)
       end
     end

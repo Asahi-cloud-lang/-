@@ -69,10 +69,13 @@ class ApplicationController < ActionController::Base
       elsif @one_week.count == @attendances.count + @last_week.count
         @last_week.each { |day| @user.attendances.create!(worked_on: day) } 
       elsif @one_week.count == @attendances.count + @first_week.count
-        @first_week.each { |day| @user.attendances.create!(worked_on: day) }  
+        @first_week.each { |day| @user.attendances.create!(worked_on: day) }
+      elsif @last_day == @last_day.beginning_of_month
+        @user.attendances.create!(worked_on: @last_day)
       end
       end
     @attendances = @user.attendances.where(worked_on: [*@first_day..@last_day]).order(:worked_on)
+    @attendances_week_count = @attendances.where.not(started_at: nil).count
     end
 
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。

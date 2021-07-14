@@ -13,7 +13,7 @@ module AttendancesHelper
   # 出勤時間と退勤時間を受け取り、切りのいい時間に修正して返します。
   def working_time_format(time)
     if time.to_i < 15
-      time = 0
+      time = "00"
     elsif time.to_i < 30
       time = 15
     elsif time.to_i < 45
@@ -25,6 +25,6 @@ module AttendancesHelper
 
   # 出勤時間と退勤時間を受け取り、在社時間を計算して返します。
   def working_times(start, finish)
-    format("%.2f", (((finish - start) / 60) / 60.0))
+    format("%.2f", ((finish - start)/60)/60 )
   end
 end
